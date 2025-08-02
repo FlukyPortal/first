@@ -106,6 +106,12 @@
         .divider::after {
             margin-left: 16px;
         }
+
+        .channel-link {
+            color: #00a2ff;
+            text-decoration: underline;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -247,6 +253,8 @@
             class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden z-50">
             <div class="bg-black p-6 rounded-lg border border-gray-800 max-w-md w-full">
                 <h3 class="text-xl font-bold mb-4 text-white" id="verificationTaskTitle">VERIFY TASK</h3>
+                <p class="text-gray-400 mb-4" id="verificationInstructions">Please complete the task first:</p>
+                <a id="channelLink" target="_blank" class="channel-link mb-4 block">Click here to go to the channel</a>
                 <div class="verification-box rounded-lg p-4 mb-4 flex justify-center">
                     <img id="verificationImagePreview" src="" alt="Verification Image" class="max-h-64 hidden">
                     <p id="verificationPlaceholder" class="text-gray-500 text-center py-8">NO IMAGE SELECTED</p>
@@ -276,6 +284,15 @@
     </div>
 
     <script>
+        // Social Media Channel URLs
+        const CHANNEL_URLS = {
+            1: "https://youtube.com", // Replace with your YouTube channel URL
+            2: "https://twitter.com", // Replace with your Twitter/X URL
+            3: "https://discord.com", // Replace with your Discord invite URL
+            4: "https://instagram.com", // Replace with your Instagram URL
+            5: "https://facebook.com"  // Replace with your Facebook page URL
+        };
+
         // Initialize data structures
         if (!localStorage.getItem('users')) {
             localStorage.setItem('users', JSON.stringify([]));
@@ -309,6 +326,8 @@
         const statusBadge = document.getElementById('statusBadge');
         const currentUserEmail = document.getElementById('currentUserEmail');
         const googleUserBadge = document.getElementById('googleUserBadge');
+        const channelLink = document.getElementById('channelLink');
+        const verificationInstructions = document.getElementById('verificationInstructions');
 
         // State variables
         let currentUser = localStorage.getItem('currentUser') || null;
@@ -520,6 +539,32 @@
             const tasks = JSON.parse(localStorage.getItem('tasks'));
             const task = tasks.find(t => t.id === taskId);
 
+            // Set up the channel link and instructions
+            channelLink.href = CHANNEL_URLS[taskId];
+            channelLink.textContent = `Go to ${task.title.replace("FOLLOW ON ", "").replace("JOIN ", "").replace("LIKE ", "")}`;
+
+            let instructionText = "";
+            switch (taskId) {
+                case 1:
+                    instructionText = "Subscribe to our YouTube channel and take a screenshot of your subscription";
+                    break;
+                case 2:
+                    instructionText = "Follow us on Twitter/X and take a screenshot of your follow";
+                    break;
+                case 3:
+                    instructionText = "Join our Discord server and take a screenshot of your membership";
+                    break;
+                case 4:
+                    instructionText = "Follow us on Instagram and take a screenshot of your follow";
+                    break;
+                case 5:
+                    instructionText = "Like our Facebook page and take a screenshot of your like";
+                    break;
+                default:
+                    instructionText = "Complete the task and provide verification";
+            }
+            verificationInstructions.textContent = instructionText;
+
             document.getElementById('verificationTaskTitle').textContent = `VERIFY: ${task.title}`;
             verificationImagePreview.src = '';
             verificationImagePreview.classList.add('hidden');
@@ -530,6 +575,9 @@
             verifyButton.textContent = 'VERIFY';
 
             verificationModal.classList.remove('hidden');
+
+            // Open the channel in a new tab
+            window.open(CHANNEL_URLS[taskId], '_blank');
         }
 
         function cancelVerification() {
