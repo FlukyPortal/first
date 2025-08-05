@@ -122,6 +122,18 @@
     <div class="hidden-data" id="userData"></div>
     <div class="hidden-data" id="taskData"></div>
 
+    <!-- Footer with Privacy Policy and Terms links -->
+    <footer class="w-full text-center py-6 bg-black border-t border-gray-800 mt-12">
+        <div class="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-6">
+            <span class="text-gray-400 text-sm">&copy; 2025 Fluky Verification Portal</span>
+            <span class="hidden md:inline-block">|</span>
+            <a href="terms-services.html" class="text-blue-400 hover:underline font-semibold">Terms of Service</a>
+            <span class="hidden md:inline-block">|</span>
+            <a href="privacy-policy.html" class="text-blue-400 hover:underline font-semibold">Privacy Policy</a>
+        </div>
+        <div class="mt-2 text-xs text-gray-500">Designed by Fluky Team. All rights reserved.</div>
+    </footer>
+
     <!-- Auth Container -->
     <div class="container mx-auto px-4 py-16 max-w-md" id="authContainer">
         <div class="bg-black p-8 rounded-lg shadow-2xl border border-gray-800">
@@ -345,6 +357,15 @@
 
     <script>
         // Social Media Channel URLs
+        // Footer modal logic
+        document.getElementById('privacyLink').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('privacyModal').classList.remove('hidden');
+        });
+        document.getElementById('termsLink').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('termsModal').classList.remove('hidden');
+        });
         const CHANNEL_URLS = {
             1: "https://www.youtube.com/channel/UCdBFQKUVewkE25jZBcGdMFA", // Replace with your YouTube channel URL
             2: "https://x.com/Fluky_Official", // Replace with your Twitter/X URL
