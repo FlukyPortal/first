@@ -237,7 +237,7 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <p class="text-gray-400">Tasks Completed: <span id="completedTasks"
-                                class="text-white">0</span>/5</p>
+                                class="text-white">0</span>/4</p>
                     </div>
                     <div id="statusBadge" class="bg-gray-800 text-white px-3 py-1 rounded-full text-sm">
                         ACTIVE
@@ -618,7 +618,7 @@
                 }
             }
 
-            if (completedCount === 5) {
+            if (completedCount === 4) {
                 statusBadge.textContent = 'COMPLETED';
                 statusBadge.classList.remove('bg-gray-800');
                 statusBadge.classList.add('bg-gray-600');
