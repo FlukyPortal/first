@@ -4,9 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/media/file.svg">
     <title>Fluky Verification</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script defer src="https://vercel.live/_analytics/script.js"></script>
     <style>
         body {
             background-color: #111;
@@ -273,24 +275,80 @@
 
         <!-- Completion Modal -->
         <div id="completionModal"
-            class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden z-50">
-            <div class="bg-black p-8 rounded-lg border border-gray-800 max-w-md w-full text-center">
-                <h3 class="text-2xl font-bold mb-6 text-white creepy-text">PROCESSING COMPLETE</h3>
-                <p class="text-gray-300 mb-6">ALL TASKS HAVE BEEN VERIFIED</p>
-                <p class="text-xl font-bold text-white mb-6 creepy-text">YOU ARE ELIGIBLE</p>
-                <p class="text-gray-500 text-sm">YOUR ACCESS HAS BEEN PERMANENTLY REVOKED</p>
+            class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center hidden z-50 backdrop-blur-sm">
+            <div
+                class="bg-gradient-to-br from-gray-900 to-black p-8 rounded-lg border-2 border-gray max-w-md w-full text-center shadow-lg shadow-gray/20">
+                <!-- Title with creepy animation -->
+                <h3 class="text-3xl font-bold mb-6 text-gray creepy-text animate-pulse"
+                    style="text-shadow: 0 0 8px #ffff;">
+                    PROCESSING COMPLETE
+                </h3>
+
+                <p class="text-gray-400 mb-6 tracking-widest">ALL TASKS HAVE BEEN VERIFIED</p>
+
+                <!-- Creepy eligible replacement -->
+                <p class="text-2xl font-bold text-gray mb-6 creepy-text" style="text-shadow: 0 0 5px #ffffff;">
+                    YOU HAVE BEEN CHOSEN
+                </p>
+
+                <!-- Link box with copy button -->
+                <div class="mb-6">
+                    <div class="flex items-center bg-gray-800 rounded-md overflow-hidden border border-gray">
+                        <input type="text" id="creepyLink" value="https://your-creepy-website.com/access"
+                            class="flex-grow px-4 py-2 bg-transparent text-gray-300 font-mono text-sm truncate"
+                            readonly>
+                        <button id="copyButton"
+                            class="bg-white hover:bg-gray-700 px-4 py-2 text-black font-bold transition-colors">
+                            COPY
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bottom text with creepy effect -->
+                <p class="text-gray-600 text-xs tracking-wider creepy-text" id="revokedText">
+                    YOUR ACCESS HAS BEEN PERMANENTLY REVOKED
+                </p>
             </div>
         </div>
+
+        <!-- Add this script for the creepy effects -->
+        <script>
+            document.getElementById('copyButton').addEventListener('click', function () {
+                // Copy the link
+                const link = document.getElementById('creepyLink');
+                link.select();
+                document.execCommand('copy');
+
+                // Show creepy confirmation
+                const originalText = this.textContent;
+                this.textContent = 'COPIED...';
+                this.classList.add('bg-white');
+
+                // Create creepy floating text
+                const creepyAlert = document.createElement('div');
+                creepyAlert.textContent = `LINK COPIED: ${link.value}`;
+                creepyAlert.className = 'fixed text-bg-grayfont-mono text-sm creepy-text animate-float';
+                creepyAlert.style.left = `${Math.random() * window.innerWidth}px`;
+                creepyAlert.style.top = `${Math.random() * window.innerHeight}px`;
+                document.body.appendChild(creepyAlert);
+
+                // Remove after animation
+                setTimeout(() => {
+                    creepyAlert.remove();
+                    this.textContent = originalText;
+                    this.classList.remove('bg-gray');
+                }, 2000);
+            });
+        </script>
     </div>
 
     <script>
         // Social Media Channel URLs
         const CHANNEL_URLS = {
-            1: "https://youtube.com", // Replace with your YouTube channel URL
-            2: "https://twitter.com", // Replace with your Twitter/X URL
-            3: "https://discord.com", // Replace with your Discord invite URL
-            4: "https://instagram.com", // Replace with your Instagram URL
-            5: "https://facebook.com"  // Replace with your Facebook page URL
+            1: "https://www.youtube.com/channel/UCdBFQKUVewkE25jZBcGdMFA", // Replace with your YouTube channel URL
+            2: "https://x.com/Fluky_Official", // Replace with your Twitter/X URL
+            4: "https://www.instagram.com/fluky_portal_official?igsh=MXcwN3RxMzQ1cXA5&utm_source=qr", // Replace with your Instagram URL
+            5: "https://www.facebook.com/share/p/15ofF1LDMn/"  // Replace with your Facebook page URL
         };
 
         // Initialize data structures
@@ -301,7 +359,6 @@
             const defaultTasks = [
                 { id: 1, title: "FOLLOW ON YOUTUBE", description: "Subscribe to our YouTube channel and verify", completed: false, verified: false, image: null },
                 { id: 2, title: "FOLLOW ON TWITTER", description: "Follow us on Twitter/X and verify", completed: false, verified: false, image: null },
-                { id: 3, title: "JOIN DISCORD", description: "Join our Discord server and verify", completed: false, verified: false, image: null },
                 { id: 4, title: "FOLLOW ON INSTAGRAM", description: "Follow us on Instagram and verify", completed: false, verified: false, image: null },
                 { id: 5, title: "LIKE FACEBOOK PAGE", description: "Like our Facebook page and verify", completed: false, verified: false, image: null }
             ];
