@@ -130,12 +130,13 @@
 
             <!-- Login Form -->
             <div id="loginForm">
-                <div id="g_id_onload" data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+                <div id="g_id_onload"
+                    data-client_id="48508544336-ffr2pdtvlbr0tu93g2eta82ggtk2gtth.apps.googleusercontent.com"
                     data-context="signin" data-ux_mode="popup" data-callback="handleGoogleSignIn"
                     data-auto_prompt="false">
                 </div>
 
-                <div class="google-btn" id="googleSignInBtn">
+                <div class="google-btn" id="googleSignInBtn" onclick="googleSignIn()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                         <path fill="#4285F4"
                             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -408,33 +409,46 @@
 
         // Google Sign-In Handler
         function handleGoogleSignIn(response) {
-            // Decode the JWT response
-            const responsePayload = parseJwt(response.credential);
+            try {
+                if (!response || !response.credential) {
+                    throw new Error('Invalid Google Sign-In response');
+                }
 
-            // Store user information
-            currentUser = responsePayload.email;
-            currentUserIsGoogle = true;
+                // Decode the JWT response
+                const responsePayload = parseJwt(response.credential);
 
-            localStorage.setItem('currentUser', responsePayload.email);
-            localStorage.setItem('currentUserIsGoogle', 'true');
+                if (!responsePayload || !responsePayload.email) {
+                    throw new Error('Invalid user data from Google');
+                }
 
-            // Check if user exists, if not create account
-            const users = JSON.parse(localStorage.getItem('users'));
-            const userExists = users.some(user => user.email === responsePayload.email);
+                // Store user information
+                currentUser = responsePayload.email;
+                currentUserIsGoogle = true;
 
-            if (!userExists) {
-                users.push({
-                    email: responsePayload.email,
-                    password: '', // No password for Google users
-                    isGoogle: true
-                });
-                localStorage.setItem('users', JSON.stringify(users));
+                localStorage.setItem('currentUser', responsePayload.email);
+                localStorage.setItem('currentUserIsGoogle', 'true');
+
+                // Check if user exists, if not create account
+                const users = JSON.parse(localStorage.getItem('users'));
+                const userExists = users.some(user => user.email === responsePayload.email);
+
+                if (!userExists) {
+                    users.push({
+                        email: responsePayload.email,
+                        password: '', // No password for Google users
+                        isGoogle: true
+                    });
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+
+                // Proceed to dashboard
+                authContainer.classList.add('hidden');
+                dashboardContainer.classList.remove('hidden');
+                loadDashboard();
+            } catch (error) {
+                console.error('Google Sign-In handler error:', error);
+                alert('Google Sign-In failed. Please try again or use manual login.');
             }
-
-            // Proceed to dashboard
-            authContainer.classList.add('hidden');
-            dashboardContainer.classList.remove('hidden');
-            loadDashboard();
         }
 
         function parseJwt(token) {
@@ -448,8 +462,18 @@
         }
 
         function googleSignIn() {
-            // Trigger Google Sign-In flow
-            google.accounts.id.prompt();
+            try {
+                // Trigger Google Sign-In flow
+                google.accounts.id.prompt((notification) => {
+                    if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                        // Fallback: try to render button click
+                        console.log('Google Sign-In prompt not displayed, trying alternative method');
+                    }
+                });
+            } catch (error) {
+                console.error('Google Sign-In error:', error);
+                alert('Google Sign-In is currently unavailable. Please try manual login.');
+            }
         }
 
         // Navigation functions
@@ -580,6 +604,20 @@
 
             completedTasksElement.textContent = completedCount;
 
+            // Eligibility notification after 4 tasks
+            if (completedCount === 4) {
+                if (!document.getElementById('eligibilityNotification')) {
+                    const notification = document.createElement('div');
+                    notification.id = 'eligibilityNotification';
+                    notification.className = 'fixed bottom-8 right-8 bg-green-700 text-white px-6 py-4 rounded-lg shadow-lg z-50 font-bold text-lg';
+                    notification.textContent = 'Congratulations! You are now eligible.';
+                    document.body.appendChild(notification);
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 4000);
+                }
+            }
+
             if (completedCount === 5) {
                 statusBadge.textContent = 'COMPLETED';
                 statusBadge.classList.remove('bg-gray-800');
@@ -688,23 +726,29 @@
 
         // Initialize the app
         window.addEventListener('DOMContentLoaded', () => {
-            // Initialize Google Sign-In
-            google.accounts.id.initialize({
-                client_id: "48508544336-ffr2pdtvlbr0tu93g2eta82ggtk2gtth.apps.googleusercontent.com",
-                callback: handleGoogleSignIn
-            });
+            try {
+                // Check if Google Sign-In script is loaded
+                if (typeof google === 'undefined' || !google.accounts) {
+                    console.error('Google Sign-In script not loaded');
+                    return;
+                }
 
-            // Render Google Sign-In button
-            google.accounts.id.renderButton(
-                document.getElementById("googleSignInBtn"),
-                { theme: "outline", size: "large", width: "100%" }
-            );
+                // Initialize Google Sign-In
+                google.accounts.id.initialize({
+                    client_id: "48508544336-ffr2pdtvlbr0tu93g2eta82ggtk2gtth.apps.googleusercontent.com",
+                    callback: handleGoogleSignIn,
+                    auto_select: false,
+                    cancel_on_tap_outside: true
+                });
 
-            // Check if user is logged in
-            if (currentUser) {
-                authContainer.classList.add('hidden');
-                dashboardContainer.classList.remove('hidden');
-                loadDashboard();
+                // Check if user is logged in
+                if (currentUser) {
+                    authContainer.classList.add('hidden');
+                    dashboardContainer.classList.remove('hidden');
+                    loadDashboard();
+                }
+            } catch (error) {
+                console.error('Google Sign-In initialization error:', error);
             }
         });
     </script>
